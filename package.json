@@ -1,0 +1,49 @@
+{
+  "name": "daskeyboardqcputemp",
+  "authorName": "Eric Haughee",
+  "authorUrl": "https://github.com/ehaughee",
+  "issuesUrl": "https://github.com/ehaughee/daskeyboardqcputemp/issues",
+  "homePageUrl": "https://github.com/ehaughee",
+  "licenseUrl": "https://opensource.org/licenses/MIT",
+  "changelogUrl": "CHANGELOG.md",
+  "readMeUrl": "README.md",
+  "readMeEndUserUrl": "README.md",
+  "displayName": "CPU Temp",
+  "publisher": "Nobody",
+  "version": "1.0.0",
+  "description": "CPU Temperature Monitor",
+  "developerRepoUrl": "https://github.com/ehaughee/daskeyboardqcputemp",
+  "icon": "assets/icon.png",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "daskeyboard-applet": "^2.11.4",
+    "node-wmi": "0.0.5"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.13.0"
+  },
+  "qConfig": {
+    "geometry": {
+      "width": 1,
+      "height": 1,
+      "defaults": {
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    }
+  },
+  "engines": {
+    "das-keyboard-q": "3.0.0"
+  }
+}
