@@ -8,12 +8,14 @@
   "changelogUrl": "CHANGELOG.md",
   "readMeUrl": "README.md",
   "readMeEndUserUrl": "README.md",
-  "displayName": "CPU Temp",
-  "publisher": "Nobody",
-  "version": "1.0.0",
-  "description": "CPU Temperature Monitor",
+  "displayName": "WMI Temp Monitor",
+  "publisher": "Eric Haughee",
+  "version": "0.0.1",
+  "description": "Windows Management Instrumentation Temperature Monitor",
   "developerRepoUrl": "https://github.com/ehaughee/daskeyboardqcputemp",
   "icon": "assets/icon.png",
+  "image": "assets/image.png",
+  "isSingleton": false,
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -39,7 +41,31 @@
           "y": 0
         }
       }
-    }
+    },
+    "questions": [{
+      "key": "wmiId",
+      "label": "WMI Identifier",
+      "help": "See readme/details for instructions on finding this",
+      "placeholder": "/wmi/identifier/here",
+      "required": true,
+      "controlType": "textbox"
+    }, {
+      "key": "displayName",
+      "label": "Name of component to monitor",
+      "help": "The display name of the component you want to monitor.  This is just so that multiple applets can be distinguished.   It is not required for normal operation but the applets will default to displaying 'WMI Temp'.",
+      "placeholder": "WMI",
+      "required": false,
+      "controlType": "textbox"
+    }, {
+      "key": "pollingInterval",
+      "label": "Polling interval",
+      "help": "How often to check for the current temperature, in milliseconds.",
+      "placeholder": "3000",
+      "required": false,
+      "controlType": "textbox"
+    }, {
+
+    }]
   },
   "engines": {
     "das-keyboard-q": "3.0.0"

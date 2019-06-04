@@ -2,74 +2,18 @@
 const q = require('daskeyboard-applet');
 const wmi = require('node-wmi');
 
-// Color associated to cpu temperature from low (green) to high (red).
-const COLORS = [
-  '#00FF00', '#00FF00', '#00FF00', '#00FF00', '#FFFF00', '#FFFF00', '#FF0000', '#FF0000', '#FF0000', '#FF0000',
-];
-
 const { logger } = q;
 
 // eslint-disable-next-line no-unused-vars
-class CpuTemp extends q.DesktopApp {
+class WmiTemp extends q.DesktopApp {
   constructor() {
     super();
-    CpuTemp.log('CTOR');
-    this.pollingInterval = 3000;
-    CpuTemp.log('CPU Temperature Meter ready to go!');
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  async run() {
-    CpuTemp.log('Running...');
-    return CpuTemp.getCpuTemp()
-      .then(temp => new q.Signal({
-        points: [
-          [CpuTemp.generatePoint(temp)],
-        ],
-        name: 'CPU Temp',
-        message: `${temp} \u00B0F`,
-        isMuted: true,
-      })).catch((err) => {
-        CpuTemp.log(err, 'error');
-      });
-  }
-
-  static async getCpuTemp() {
-    CpuTemp.log('Getting CPU temperature');
-    return new Promise((resolve) => {
-      wmi.Query({
-        namespace: 'root/OpenHardwareMonitor',
-        class: 'Sensor',
-        where: "identifier='/lpc/nct6791d/temperature/0'",
-      }, (err, temperatureData) => {
-        if (err) {
-          throw err;
-        }
-        CpuTemp.log(`Got CPU temperature: ${temperatureData[0].Value}`);
-        resolve(temperatureData[0].Value);
-      });
-    });
-  }
-
-  static generatePoint(temp) {
-    return new q.Point(CpuTemp.getColor(temp));
-  }
-
-  static getColor(temp) {
-    const minTemp = 20;
-    let colorIndex = 0;
-    if (temp > 10 * COLORS.length) {
-      colorIndex = COLORS.length - 1;
-    } else if (temp > minTemp) {
-      colorIndex = Math.floor((temp - minTemp) / COLORS.length);
-    }
-
-    CpuTemp.log(`Got color: ${COLORS[colorIndex]}`);
-    return COLORS[colorIndex];
+    this.pollingInterval = this.config.pollingInterval || 3000;
+    WmiTemp.log(`${this.displayName} Temperature Meter ready to go!`);
   }
 
   static log(message, level) {
-    const prefix = '[CpuTemp]';
+    const prefix = '[WmiTemp]';
     const prefixedMessage = `${prefix} ${message}`;
     if (level === 'error') {
       logger.error(prefixedMessage);
@@ -77,11 +21,86 @@ class CpuTemp extends q.DesktopApp {
       logger.info(prefixedMessage);
     }
   }
+
+  static formatTempDisplay(temp) {
+    const unitsSymbol = 'C';
+    return `${temp} \u00B0${unitsSymbol}`;
+  }
+
+  get displayName() {
+    return this.config.displayName || 'WMI';
+  }
+
+  /**
+   * Colors associated to cpu temperature from low (green) to high (red).
+   */
+  // eslint-disable-next-line class-methods-use-this
+  get colors() {
+    return [
+      '#00FF00', '#00FF00', '#00FF00', '#00FF00', '#FFFF00', '#FFFF00', '#FF0000', '#FF0000', '#FF0000', '#FF0000',
+    ];
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async run() {
+    WmiTemp.log('Running...');
+    return this.getCpuTemp()
+      .then(temp => new q.Signal({
+        points: [
+          [this.generatePoint(temp)],
+        ],
+        name: `${this.displayName} Temp`,
+        message: WmiTemp.formatTempDisplay(temp),
+        isMuted: true,
+      })).catch((err) => {
+        WmiTemp.log(err, 'error');
+        // eslint-disable-next-line new-cap
+        return new q.Signal.error([
+          'Encountered error trying to get temperature.',
+          `Error: ${err}`,
+        ]);
+      });
+  }
+
+  async getCpuTemp() {
+    WmiTemp.log(`Getting ${this.displayName} temperature`);
+    return new Promise((resolve) => {
+      wmi.Query({
+        namespace: 'root/OpenHardwareMonitor',
+        class: 'Sensor',
+        // TODO: "identifier='/lpc/nct6791d/temperature/0'",
+        where: `identifier='${this.config.wmiId}'`,
+      }, (err, temperatureData) => {
+        if (err) {
+          throw err;
+        }
+        WmiTemp.log(`Got ${this.displayName} temperature: ${temperatureData[0].Value}`);
+        resolve(temperatureData[0].Value);
+      });
+    });
+  }
+
+  getColor(temp) {
+    const minTemp = 20;
+    let colorIndex = 0;
+    if (temp > 10 * this.colors.length) {
+      colorIndex = this.colors.length - 1;
+    } else if (temp > minTemp) {
+      colorIndex = Math.floor((temp - minTemp) / this.colors.length);
+    }
+
+    WmiTemp.log(`Got color: ${this.colors[colorIndex]}`);
+    return this.colors[colorIndex];
+  }
+
+  generatePoint(temp) {
+    return new q.Point(this.getColor(temp));
+  }
 }
 
 module.exports = {
-  CpuTemp,
+  WmiTemp,
 };
 
 // eslint-disable-next-line no-unused-vars
-const cpuTemp = new CpuTemp();
+const wmiTemp = new WmiTemp();
