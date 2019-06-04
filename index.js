@@ -35,7 +35,7 @@ class CpuTemp extends q.DesktopApp {
   }
 
   static async getCpuTemp() {
-    CpuTemp.log('Getting CPU Temperature');
+    CpuTemp.log('Getting CPU temperature');
     return new Promise((resolve) => {
       wmi.Query({
         namespace: 'root/OpenHardwareMonitor',
@@ -45,7 +45,7 @@ class CpuTemp extends q.DesktopApp {
         if (err) {
           throw err;
         }
-        CpuTemp.log(`Got CPU Temperature: ${temperatureData[0].Value}`);
+        CpuTemp.log(`Got CPU temperature: ${temperatureData[0].Value}`);
         resolve(temperatureData[0].Value);
       });
     });
